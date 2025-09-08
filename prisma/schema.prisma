@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model users {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  passwordHash  String
+  profile_image String?
+  createdAt     DateTime @default(now())
+
+  createdGames   games[]  @relation("Creator")
+  gamesAsPlayer2 games[]  @relation("PlayerTwo")
+  gamesWon       games[]  @relation("WinnerUser")
+  payments       payments[] @relation("PaymentUser")
+}
+
+model games {
+  id                      String   @id @default(uuid())
+  bet_amount              BigInt
+  game_code               String   @unique
+  status                  String   // "waiting", "in_progress", "completed"
+  creator_id              String
+  player_two_id           String?
+  winner_user_id          String?
+  player_one_public_key   String
+  player_two_public_key   String?
+  createdAt               DateTime @default(now())
+
+  creator     users   @relation("Creator", fields: [creator_id], references: [id])
+  player_two  users?  @relation("PlayerTwo", fields: [player_two_id], references: [id])
+  winner_user users?  @relation("WinnerUser", fields: [winner_user_id], references: [id])
+}
+
+model payments {
+  id                String   @id @default(uuid())
+  user_id           String
+  user_public_key   String?
+  amount            BigInt
+  status            String // Win, Loss
+  payment_signature String?
+  game_code         String
+  createdAt         DateTime @default(now())
+
+  user users @relation("PaymentUser", fields: [user_id], references: [id])
+}
+
