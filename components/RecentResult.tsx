@@ -1,14 +1,18 @@
 "use client";
 
+
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+
 
 interface PaymentResult {
   id: string;
   user_id: string;
   amount: number | string;
+
   status: 'Win' | 'Lost' | string;
+
   createdAt: string;
 }
 
@@ -28,7 +32,8 @@ export default function RecentResult() {
 
   return (
     <>
-      {results.length > 0 ? 
+
+      {results.length > 0 ? (
         <div className="recent-flips bg-purple-dark py-4" id="learnMore">
           <div className="container">
             <h4 className="text-white mb-4">Recent Result</h4>
@@ -50,7 +55,8 @@ export default function RecentResult() {
             </div>
           </div>
         </div>
-      : null}
+      ) : null}
+
     </>
   );
 }
