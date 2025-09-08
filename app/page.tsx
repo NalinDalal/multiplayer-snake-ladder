@@ -1,103 +1,165 @@
-import Image from "next/image";
+
+"use client";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Dice5, Coins, Users, Shield, ArrowRight, Linkedin, TwitterIcon } from 'lucide-react';
+import { SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
+import RecentResult from '@/components/RecentResult';
+import axios from 'axios';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { isSignedIn, user } = useUser();
+  const router = useRouter();
+  const date = new Date();
+  const year = date.getFullYear();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+
+  useEffect(() => {
+    if (user) {
+      axios.post('/api/save-user', {
+        id: user.id,
+        name: user.fullName,
+        email: user.primaryEmailAddress?.emailAddress,
+      })
+      .then((response) => {
+        console.log('User saved successfully:', response.data);
+      })
+      .catch((error) => {
+        console.error('Error saving user:', error.response?.data || error.message);
+      });
+    }
+  }, [user]);
+
+  return (
+    <div className="min-vh-100">
+      <header className="container py-5">
+        <nav className="d-flex justify-content-between align-items-center mb-5">
+          <div className="d-flex align-items-center gap-2">
+            <Dice5 className="text-yellow" size={32} />
+            <span className="fs-4 fw-bold text-white">SnakesWin</span>
+          </div>
+          <div className="d-flex gap-3">
+          {isSignedIn ? (
+              <>
+                <span className="text-white d-flex align-items-center">Welcome, {user.fullName}</span>
+                <SignOutButton>
+                  <button className="btn text-white">Sign out</button>
+                </SignOutButton>
+                <button className="btn btn-yellow" onClick={() => router.push('/create-or-join-game')}>Play Now</button>
+              </>
+            ) : (
+              <>
+                <SignInButton mode="modal">
+                  <button className="btn text-white">Login</button>
+                </SignInButton>
+                <SignInButton mode="modal">
+                  <button className="btn btn-yellow">Play Now</button>
+                </SignInButton>
+              </>
+            )}
+          </div>
+        </nav>
+        <div className="row align-items-center gy-4">
+          <div className="col-md-6 text-center text-md-start" style={{ animation: 'float 2s ease-in-out infinite' }}>
+            <h1 className="display-4 fw-bold text-white mb-4">
+              Play Snakes & Ladders
+              <span className="d-block text-yellow">Win SOLANA!</span>
+            </h1>
+            <p className="lead text-white-50 mb-4">
+              Experience the classic game with a modern twist. Compete with players worldwide and win big with Solana.
+            </p>
+            <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-md-start">
+              {isSignedIn ?
+                <button className="btn btn-yellow btn-lg d-flex align-items-center justify-content-center gap-2" onClick={() => router.push('/create-or-join-game')}>
+                  Start Playing <ArrowRight size={20} />
+                </button>
+              :
+                <SignInButton mode="modal">
+                  <button className="btn btn-yellow btn-lg d-flex align-items-center justify-content-center gap-2">Start Playing</button>
+                </SignInButton>
+              }
+              <a href='#learnMore'> <button className="btn btn-outline-light btn-lg">Learn More</button></a>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <img 
+              src="https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&q=80&w=600"
+              alt="Dice Game"
+              className="img-fluid rounded-4 shadow"
+              style={{ minHeight: '400px' }}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </header>
+      <RecentResult />
+      <section className="py-5 bg-purple-dark" id="learnMore">
+        <div className="container">
+          <h2 className="text-center text-white mb-5">Why Choose SnakesWin?</h2>
+          <div className="row g-4">
+            <div className="col-md-6">
+              <FeatureCard 
+                icon={<Coins size={32} />}
+                title="Solana Integration"
+                description="Use Solana for lightning-fast crypto transactions."
+              />
+            </div>
+            <div className="col-md-6">
+              <FeatureCard 
+                icon={<Users size={32} />}
+                title="Multiplayer"
+                description="Compete with players from around the world in real-time."
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="py-5 bg-purple-dark">
+        <div className="container text-center">
+          <div className="d-flex align-items-center justify-content-center gap-2 mb-4">
+            <Shield className="text-yellow" size={32} />
+            <h2 className="mb-0 text-white">Secure Gaming</h2>
+          </div>
+          <p className="text-white-50 mx-auto" style={{ maxWidth: '600px' }}>
+            Your security is our priority. All transactions are encrypted and protected. 
+            We are licensed and regulated to ensure fair play.
+          </p>
+        </div>
+      </section>
+      <footer className="py-4 footer">
+        <div className="container">
+          <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div className="d-flex align-items-center gap-2">
+              <Dice5 className="text-yellow" size={24} />
+              <span className="text-white">SnakesWin</span>
+            </div>
+            <p className="text-white-50 mb-0 small">
+              &copy; {year} SnakesWin. All rights reserved.
+            </p>
+            <div className="d-flex align-items-center gap-3">
+              <a href="https://x.com/ShrinjoyS" target="_blank" rel="noopener noreferrer">
+                <TwitterIcon className="text-white-50 hover:text-white" size={20} />
+              </a>
+              <a href="https://www.linkedin.com/in/shrinjoy-saha/" target="_blank" rel="noopener noreferrer">
+                <Linkedin className="text-white-50 hover:text-white" size={20} />
+              </a>
+            </div>
+          </div>
+        </div>
       </footer>
+    </div>
+  );
+}
+
+function FeatureCard({ icon, title, description }: {
+  icon: React.ReactElement;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="feature-card h-100 p-4 rounded-4 text-center">
+      <div className="text-yellow mb-3">{icon}</div>
+      <h3 className="fs-5 fw-semibold text-white mb-2">{title}</h3>
+      <p className="text-white-50 mb-0">{description}</p>
     </div>
   );
 }
