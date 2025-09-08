@@ -28,3 +28,5 @@ POSTGRES_PORT=5432
 DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
 
 ```
+
+inspired from : [be](https://github.com/shrinjoy979/multiplayer-snake-and-ladder-game-backend/tree/main), [fe](https://github.com/shrinjoy979/multiplayer-snake-and-ladder-game-frontend/tree/main)
